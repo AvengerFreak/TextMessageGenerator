@@ -1,20 +1,33 @@
 import os
-from etext import send_sms_via_email
 from dotenv import load_dotenv
+from twilio.rest import Client
 
 load_dotenv()
 
-phone_number = os.getenv('RECIPIENT_PHONE_NUMBER') # number of person you want to send message
-sender = os.getenv('SENDER_EMAIL') # gmail you used to generate app password
-password = os.getenv('EMAIL_PASSWORD') # generate app password in gmail account
-message = "I Love You - by code!"
-subject = "Python Generated Text"
-provider = "T-Mobile"
+# Find your Account SID and Auth Token at twilio.com/console
+# and set the environment variables. See http://twil.io/secure
+print("getting credentials from .env")
+account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+client = Client(account_sid, auth_token)
 
-sender_credentials = (sender, password)
+"""
+curl.exe -X POST "https://api.twilio.com/2010-04-01/Accounts/sid/Messages.json" ^
+  --data-urlencode "Body=message" ^
+  --data-urlencode "From=sender" ^
+  --data-urlencode "To=recipient" ^
+  -u "sid:auth-token"
+"""
 
-send_sms_via_email(
-    phone_number, message, provider, sender_credentials, subject=subject
-)
+print("sending message")
+message = client.messages \
+    .create(
+         body=os.getenv('SECRET_MESSAGE'),
+         from_=os.getenv('SENDER_PHONE_NUMBER'),
+         to= os.getenv('RECIPIENT_PHONE_NUMBER')
+     )
+
+print("message was sent sucessfully")
+
 
 
